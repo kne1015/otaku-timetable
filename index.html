@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오타쿠 대학교 시간표 제작기 🌿</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas CDN for image download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts: Gowun Dodum & Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mint: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a'
+                        }
+                    },
+                    fontFamily: {
+                        gowun: ['"Gowun Dodum"', 'sans-serif'],
+                        sans: ['"Noto Sans KR"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f0fdfa;
+            background-image: radial-gradient(#99f6e4 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .font-gowun {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ccfbf1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2dd4bf;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d9488;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-3 sm:px-6">
+
+    <div class="max-w-4xl mx-auto space-y-5">
+        
+        <!-- Header / Banner -->
+        <header class="bg-white/90 backdrop-blur border-2 border-mint-300 rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <div class="w-12 h-12 bg-mint-100 rounded-full flex items-center justify-center border-2 border-mint-400 text-mint-600 text-xl shadow-inner shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-mint-600 font-gowun flex items-center gap-2 justify-center sm:justify-start">
+                        오타쿠 대학교 시간표 제작기 🌿
+                    </h1>
+                    <p class="text-xs text-mint-600 font-medium mt-0.5">
+                        나만의 최애 수강신청 시간표를 직접 만들어보세요!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="downloadTimetable()" class="bg-mint-500 hover:bg-mint-600 active:scale-95 text-white font-bold px-4 py-2 rounded-xl shadow transition-all flex items-center gap-2 text-xs sm:text-sm cursor-pointer">
+                    <i class="fa-solid fa-download"></i> 이미지 저장
+                </button>
+                <button onclick="resetTimetable()" class="bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-700 font-bold px-3 py-2 rounded-xl transition-all text-xs sm:text-sm cursor-pointer" title="시간표 초기화">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+            
+            <!-- Left Side: Control Panel (Inputs & Options) -->
+            <div class="md:col-span-5 space-y-4">
+                
+                <!-- Student Info Card -->
+                <div class="bg-white border-2 border-mint-200 rounded-2xl p-4 shadow-sm space-y-3">
+                    <h2 class="font-bold text-mint-600 text-sm flex items-center gap-1.5 border-b-2 border-mint-100 pb-1.5">
+                        <i class="fa-regular fa-id-card"></i> 학생증 정보
+                    </h2>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">학과</label>
+                            <input type="text" id="department" value="보컬로이드학과" placeholder="예: 디자인학과" class="w-full px-2.5 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">이름 / 닉네임</label>
+                            <input type="text" id="studentName" value="라보멤" placeholder="이름 입력" class="w-full px-2.5 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Addition Form -->
+                <div class="bg-white border-2 border-mint-200 rounded-2xl p-4 shadow-sm space-y-3">
+                    <h2 class="font-bold text-mint-600 text-sm flex items-center gap-1.5 border-b-2 border-mint-100 pb-1.5">
+                        <i class="fa-solid fa-circle-plus"></i> 수업 추가
+                    </h2>
+                    
+                    <form id="courseForm" onsubmit="handleAddCourse(event)" class="space-y-2.5 text-xs">
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">과목명 *</label>
+                            <input type="text" id="courseTitle" required placeholder="예: 보컬로이드역사학개론, 마이너 미연시 추천" class="w-full px-2.5 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">교수명</label>
+                            <input type="text" id="professor" placeholder="예: 라보멤, 언데드 발렌타인" class="w-full px-2.5 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors">
+                        </div>
+
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">요일 *</label>
+                            <select id="courseDay" class="w-full px-2.5 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors bg-white">
+                                <option value="월">월요일</option>
+                                <option value="화">화요일</option>
+                                <option value="수">수요일</option>
+                                <option value="목">목요일</option>
+                                <option value="금">금요일</option>
+                            </select>
+                        </div>
+
+                        <!-- Time Selection Range -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block font-medium text-gray-700 mb-1">시작 시간 *</label>
+                                <select id="startTime" class="w-full px-2 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors bg-white">
+                                    <option value="9">09:00 (1교시)</option>
+                                    <option value="10">10:00 (2교시)</option>
+                                    <option value="11">11:00 (3교시)</option>
+                                    <option value="12">12:00 (4교시)</option>
+                                    <option value="13">13:00 (5교시)</option>
+                                    <option value="14">14:00 (6교시)</option>
+                                    <option value="15">15:00 (7교시)</option>
+                                    <option value="16">16:00 (8교시)</option>
+                                    <option value="17">17:00 (9교시)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-medium text-gray-700 mb-1">종료 시간 *</label>
+                                <select id="endTime" class="w-full px-2 py-1.5 border-2 border-mint-200 rounded-lg focus:outline-none focus:border-mint-500 transition-colors bg-white">
+                                    <option value="10">10:00</option>
+                                    <option value="11" selected>11:00</option>
+                                    <option value="12">12:00</option>
+                                    <option value="13">13:00</option>
+                                    <option value="14">14:00</option>
+                                    <option value="15">15:00</option>
+                                    <option value="16">16:00</option>
+                                    <option value="17">17:00</option>
+                                    <option value="18">18:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Color Palette Picker -->
+                        <div>
+                            <label class="block font-medium text-gray-700 mb-1">테마 색상</label>
+                            <div class="grid grid-cols-6 gap-1.5 pt-0.5" id="colorPalette">
+                                <!-- JS insert colors -->
+                            </div>
+                        </div>
+
+                        <!-- Error Message Alert -->
+                        <div id="errorMessage" class="hidden p-2 bg-red-100 border border-red-300 text-red-600 rounded-lg text-[11px] font-medium animate-bounce">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 시간을 올바르게 확인해 주세요! (시간 중복 또는 종료시간 오류)
+                        </div>
+
+                        <button type="submit" class="w-full bg-mint-500 hover:bg-mint-600 active:scale-98 text-white font-bold py-2 rounded-lg shadow transition-all cursor-pointer text-xs">
+                            시간표에 추가하기 ✨
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Added Course List -->
+                <div class="bg-white border-2 border-mint-200 rounded-2xl p-4 shadow-sm space-y-2">
+                    <h2 class="font-bold text-mint-600 text-sm flex items-center gap-1.5 border-b-2 border-mint-100 pb-1.5">
+                        <i class="fa-solid fa-list-check"></i> 신청 목록 (<span id="courseCount">0</span>개)
+                    </h2>
+                    <div id="courseList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                        <p class="text-[11px] text-gray-400 text-center py-2">등록된 과목이 없습니다.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Side: Timetable Display (Optimized for One-Screen Capture) -->
+            <div class="md:col-span-7">
+                <div class="bg-white border-3 border-mint-300 rounded-2xl p-3 sm:p-4 shadow-xl relative overflow-hidden" id="timetableArea">
+                    
+                    <!-- Timetable Header Area inside Canvas -->
+                    <div class="flex justify-between items-center border-b-2 border-mint-200 pb-2 mb-3">
+                        <div>
+                            <div class="text-base sm:text-lg font-bold font-gowun text-mint-600 tracking-wide">
+                                🌿 오타쿠대학교 수강시간표
+                            </div>
+                            <div class="text-[9px] text-mint-500">
+                                OTAKU UNIVERSITY TIMETABLE
+                            </div>
+                        </div>
+                        <div class="bg-mint-50 border border-mint-200 px-2.5 py-1 rounded-lg text-[11px] text-right">
+                            <div><span class="font-semibold text-mint-600">학과:</span> <span id="displayDept" class="font-bold text-gray-800">보컬로이드학과</span></div>
+                            <div><span class="font-semibold text-mint-600">학생:</span> <span id="displayName" class="font-bold text-gray-800">라보멤</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Timetable Grid Table (Compact) -->
+                    <div class="w-full">
+                        <table class="w-full text-center border-collapse table-fixed">
+                            <thead>
+                                <tr class="bg-mint-100 text-mint-800 text-xs border-b border-mint-300">
+                                    <th class="p-1 border-r border-mint-200 w-12 font-bold text-[11px]">시간</th>
+                                    <th class="p-1 border-r border-mint-200 font-bold text-[11px]">월</th>
+                                    <th class="p-1 border-r border-mint-200 font-bold text-[11px]">화</th>
+                                    <th class="p-1 border-r border-mint-200 font-bold text-[11px]">수</th>
+                                    <th class="p-1 border-r border-mint-200 font-bold text-[11px]">목</th>
+                                    <th class="p-1 font-bold text-[11px]">금</th>
+                                </tr>
+                            </thead>
+                            <tbody id="timetableBody" class="text-[11px]">
+                                <!-- Dynamic Grid Built via Javascript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Watermark Footer inside canvas -->
+                    <div class="mt-3 pt-2 border-t border-mint-100 flex justify-between items-center text-[9px] text-mint-500 font-medium">
+                        <span>otaku.univ / 2026-2학기</span>
+                        <span>✨ 나만의 시간표 ✨</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-mint-600 text-white px-3 py-2 rounded-xl shadow-xl transition-all duration-300 opacity-0 translate-y-8 pointer-events-none flex items-center gap-2 text-xs z-50">
+        <i class="fa-solid fa-circle-check"></i> <span id="toastMsg">메시지 내용</span>
+    </div>
+
+    <script>
+        // Preset Pastel Palette
+        const PALETTE = [
+            { bg: '#ccfbf1', border: '#2dd4bf', text: '#115e59' }, // Mint
+            { bg: '#ffd1dc', border: '#f472b6', text: '#831843' }, // Pink
+            { bg: '#a9def9', border: '#38bdf8', text: '#0c4a6e' }, // Sky Blue
+            { bg: '#e4c1f9', border: '#c084fc', text: '#581c87' }, // Lavender
+            { bg: '#fcf6bd', border: '#facc15', text: '#713f12' }, // Yellow
+            { bg: '#d0f4de', border: '#4ade80', text: '#14532d' }  // Light Green
+        ];
+
+        let selectedColorIndex = 0;
+        let courses = []; 
+
+        const DAYS = ['월', '화', '수', '목', '금'];
+        const START_HOUR = 9;
+        const END_HOUR = 18;
+
+        // Init page
+        window.onload = function() {
+            renderColorPalette();
+            renderTimetableGrid();
+            setupInfoListeners();
+            
+            // Add initial sample courses
+            courses.push({
+                id: Date.now(),
+                title: '보컬로이드역사학개론',
+                professor: '라보멤',
+                day: '화',
+                start: 10,
+                end: 12,
+                hours: 2,
+                color: PALETTE[0]
+            });
+            courses.push({
+                id: Date.now() + 1,
+                title: '마이너 미연시 추천',
+                professor: '언데드 발렌타인',
+                day: '목',
+                start: 13,
+                end: 15,
+                hours: 2,
+                color: PALETTE[3]
+            });
+
+            updateTimetable();
+        };
+
+        // Render Color Buttons
+        function renderColorPalette() {
+            const container = document.getElementById('colorPalette');
+            container.innerHTML = '';
+
+            PALETTE.forEach((color, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `w-7 h-7 rounded-full border-2 transition-transform ${index === selectedColorIndex ? 'scale-110 ring-2 ring-mint-500' : 'hover:scale-105'}`;
+                btn.style.backgroundColor = color.bg;
+                btn.style.borderColor = color.border;
+                btn.onclick = () => {
+                    selectedColorIndex = index;
+                    renderColorPalette();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // Setup sync between input & canvas headers
+        function setupInfoListeners() {
+            const deptInput = document.getElementById('department');
+            const nameInput = document.getElementById('studentName');
+            const displayDept = document.getElementById('displayDept');
+            const displayName = document.getElementById('displayName');
+
+            deptInput.addEventListener('input', (e) => displayDept.innerText = e.target.value || '오타쿠학과');
+            nameInput.addEventListener('input', (e) => displayName.innerText = e.target.value || '학생');
+        }
+
+        // Render empty compact timetable grid structure
+        function renderTimetableGrid() {
+            const tbody = document.getElementById('timetableBody');
+            tbody.innerHTML = '';
+
+            for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+                const tr = document.createElement('tr');
+                tr.className = 'h-10 border-b border-mint-100';
+
+                // Time label column
+                const timeTd = document.createElement('td');
+                timeTd.className = 'border-r border-mint-200 bg-mint-50/40 text-gray-500 font-medium p-0.5 text-[10px]';
+                timeTd.innerHTML = `${hour}:00`;
+                tr.appendChild(timeTd);
+
+                // Day columns
+                DAYS.forEach(day => {
+                    const td = document.createElement('td');
+                    td.className = 'border-r border-mint-100 p-0.5 relative align-top';
+                    td.id = `cell-${day}-${hour}`;
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            }
+        }
+
+        // Add Course Handle
+        function handleAddCourse(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('courseTitle').value.trim();
+            const professor = document.getElementById('professor').value.trim();
+            const day = document.getElementById('courseDay').value;
+            const start = parseInt(document.getElementById('startTime').value);
+            const end = parseInt(document.getElementById('endTime').value);
+            const errorMsg = document.getElementById('errorMessage');
+
+            // Validate start & end time
+            if (end <= start) {
+                errorMsg.innerText = '종료 시간은 시작 시간보다 나중이어야 합니다!';
+                errorMsg.classList.remove('hidden');
+                setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const hours = end - start;
+
+            // Check Collision
+            if (checkCollision(day, start, end)) {
+                errorMsg.innerText = '이미 해당 시간에 다른 수업이 있습니다!';
+                errorMsg.classList.remove('hidden');
+                setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+                return;
+            }
+
+            // Save course
+            const newCourse = {
+                id: Date.now(),
+                title,
+                professor,
+                day,
+                start,
+                end,
+                hours,
+                color: PALETTE[selectedColorIndex]
+            };
+
+            courses.push(newCourse);
+            updateTimetable();
+            
+            // Clear inputs
+            document.getElementById('courseTitle').value = '';
+            document.getElementById('professor').value = '';
+            showToast('✨ 수업이 시간표에 추가되었습니다!');
+        }
+
+        // Check time slot collision based on start/end range
+        function checkCollision(day, start, end, ignoreId = null) {
+            return courses.some(course => {
+                if (ignoreId && course.id === ignoreId) return false;
+                if (course.day !== day) return false;
+                
+                return Math.max(course.start, start) < Math.min(course.end, end);
+            });
+        }
+
+        // Remove Course
+        function deleteCourse(id) {
+            courses = courses.filter(c => c.id !== id);
+            updateTimetable();
+            showToast('🗑️ 수업이 삭제되었습니다.');
+        }
+
+        // Update Timetable UI Render
+        function updateTimetable() {
+            renderTimetableGrid();
+
+            document.getElementById('courseCount').innerText = courses.length;
+
+            courses.forEach(course => {
+                const targetCell = document.getElementById(`cell-${course.day}-${course.start}`);
+                if (targetCell) {
+                    const block = document.createElement('div');
+                    block.className = 'w-full rounded-lg p-1 flex flex-col justify-center items-center text-center shadow-xs relative group transition-all duration-200 border z-10';
+                    block.style.backgroundColor = course.color.bg;
+                    block.style.borderColor = course.color.border;
+                    block.style.color = course.color.text;
+                    
+                    // Compact height for 1 hour row (40px per hour)
+                    const heightInPx = course.hours * 40 - 4; 
+                    block.style.height = `${heightInPx}px`;
+
+                    block.innerHTML = `
+                        <div class="font-bold text-[11px] leading-tight break-keep">${course.title}</div>
+                        ${course.professor ? `<div class="text-[9px] opacity-80 mt-0.5">${course.professor}</div>` : ''}
+                        <button onclick="deleteCourse(${course.id})" class="absolute top-0.5 right-0.5 w-4 h-4 bg-red-400 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[9px] shadow cursor-pointer" title="삭제">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+
+                    targetCell.appendChild(block);
+                }
+            });
+
+            // Update side list
+            const courseListContainer = document.getElementById('courseList');
+            if (courses.length === 0) {
+                courseListContainer.innerHTML = '<p class="text-[11px] text-gray-400 text-center py-2">등록된 과목이 없습니다.</p>';
+                return;
+            }
+
+            courseListContainer.innerHTML = '';
+            courses.forEach(course => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-2 rounded-lg border text-xs bg-gray-50 hover:bg-gray-100 transition-colors';
+                item.innerHTML = `
+                    <div class="flex items-center gap-1.5 overflow-hidden">
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0 border" style="background-color:${course.color.bg}; border-color:${course.color.border}"></span>
+                        <div class="truncate text-[11px]">
+                            <span class="font-bold text-gray-800">${course.title}</span>
+                            <span class="text-gray-400 text-[9px]">(${course.day} ${course.start}:00~${course.end}:00)</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteCourse(${course.id})" class="text-red-400 hover:text-red-600 px-1 py-0.5 rounded cursor-pointer">
+                        <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                `;
+                courseListContainer.appendChild(item);
+            });
+        }
+
+        // Export Timetable Area as PNG image
+        function downloadTimetable() {
+            const timetableElement = document.getElementById('timetableArea');
+            showToast('📷 시간표 이미지를 생성 중입니다...');
+
+            html2canvas(timetableElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const dept = document.getElementById('department').value || '오타쿠학과';
+                const name = document.getElementById('studentName').value || '학생';
+                
+                link.download = `오타쿠대_시간표_${dept}_${name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                showToast('✅ 이미지 저장 성공!');
+            }).catch(err => {
+                console.error(err);
+                showToast('❌ 이미지 저장 중 오류가 발생했습니다.');
+            });
+        }
+
+        // Reset Timetable
+        function resetTimetable() {
+            if (confirm('시간표를 전체 초기화하시겠습니까?')) {
+                courses = [];
+                updateTimetable();
+                showToast('🧹 시간표가 초기화되었습니다.');
+            }
+        }
+
+        // Notification Toast Display
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
