@@ -86,6 +86,7 @@
         <button onclick="filterFaculty('전체')" class="tab-btn active shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-teal-500 text-white transition cursor-pointer">전체</button>
         <button onclick="filterFaculty('음성합성엔진대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">음성합성엔진대학</button>
         <button onclick="filterFaculty('애니메이션대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">애니메이션대학</button>
+        <button onclick="filterFaculty('게임대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">게임대학</button>
         <button onclick="filterFaculty('기타')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition cursor-pointer">✍️ 기타 (직접 입력)</button>
       </div>
 
@@ -262,12 +263,36 @@
         slots: [
           { day: '금', start: 12, end: 16 }
         ]
-      }
+      },
+      {
+  id: 'minor_visual_novel',
+  faculty: '게임대학',
+  name: '마이너 미연시 추천',
+  professor: '언데드 발렌타인',
+  color: '#ffdeeb', // 부드러운 분홍색 배경
+  textColor: '#c2255c', // 진한 분홍색 글씨
+  displayTime: '화 09:00~10:00',
+  slots: [
+    { day: '화', start: 9, end: 10 }
+  ]
+},
+{
+  id: 'first_korean_vn',
+  faculty: '게임대학',
+  name: '국내 최초 비주얼 노벨 미연시 게임 탐구',
+  professor: '언데드 발렌타인',
+  color: '#ffdeeb', // 부드러운 분홍색 배경
+  textColor: '#c2255c', // 진한 분홍색 글씨
+  displayTime: '금 17:00~18:00',
+  slots: [
+    { day: '금', start: 17, end: 18 }
+  ]
+}
     ];
 
     const days = ['월', '화', '수', '목', '금'];
     const startHour = 9;
-    const endHour = 17;
+    const endHour = 18;
 
     let enrolledCourses = [];
     let currentFaculty = '전체';
