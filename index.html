@@ -87,6 +87,7 @@
         <button onclick="filterFaculty('음성합성엔진대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">음성합성엔진대학</button>
         <button onclick="filterFaculty('애니메이션대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">애니메이션대학</button>
         <button onclick="filterFaculty('게임대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">게임대학</button>
+        <button onclick="filterFaculty('서브컬쳐굿즈대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">서브컬쳐굿즈대학</button>
         <button onclick="filterFaculty('기타')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition cursor-pointer">✍️ 기타 (직접 입력)</button>
       </div>
 
@@ -245,8 +246,8 @@
         faculty: '음성합성엔진대학',
         name: '보컬로이드 노래의 이해',
         professor: '라보멤',
-        color: '#fff3bf', // Soft Yellow
-        textColor: '#f08c00',
+        color: '#d3f9d8', // Soft Mint
+        textColor: '#2b8a3e',
         displayTime: '수 11:00~13:00',
         slots: [
           { day: '수', start: 11, end: 13 }
@@ -257,8 +258,8 @@
         faculty: '애니메이션대학',
         name: '타임머신 제작 실습1',
         professor: '라보멤',
-        color: '#eebefa', // Soft Lavender
-        textColor: '#9c36b5',
+        color: '#fff3bf', // Soft Yellow
+        textColor: '#f08c00',
         displayTime: '금 12:00~16:00',
         slots: [
           { day: '금', start: 12, end: 16 }
@@ -287,7 +288,43 @@
   slots: [
     { day: '금', start: 17, end: 18 }
   ]
-}
+},
+      {
+        id: 'figure_brand',
+        faculty: '서브컬쳐굿즈대학',
+        name: '피규어 구매 및 브랜드 분석 개론',
+        professor: '피규로',
+        color: '#eebefa',
+        textColor: '#9c36b5',
+        displayTime: '월 10:00~13:00',
+        slots: [
+          { day: '월', start: 10, end: 13 }
+        ]
+      },
+      {
+        id: 'figure_variation',
+        faculty: '서브컬쳐굿즈대학',
+        name: '피규어 바리에이션의 이해',
+        professor: '피규로',
+        color: '#eebefa',
+        textColor: '#9c36b5',
+        displayTime: '목 14:00~17:00',
+        slots: [
+          { day: '목', start: 14, end: 17 }
+        ]
+      },
+      {
+        id: 'figure_collecting',
+        faculty: '서브컬쳐굿즈대학',
+        name: '실전 피규어 컬렉팅과 장식학',
+        professor: '피규로',
+        color: '#eebefa',
+        textColor: '#9c36b5',
+        displayTime: '화 15:00~17:00',
+        slots: [
+          { day: '화', start: 15, end: 17 }
+        ]
+      }
     ];
 
     const days = ['월', '화', '수', '목', '금'];
