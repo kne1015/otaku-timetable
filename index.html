@@ -49,7 +49,7 @@
 </head>
 <body class="bg-teal-50/40 min-h-screen text-slate-800 p-2 sm:p-6 flex flex-col items-center">
 
-  <!-- Main Container Optimized for Tablet Screen -->
+  <!-- Main Container -->
   <div class="w-full max-w-md sm:max-w-xl bg-white rounded-2xl shadow-xl border border-teal-100 overflow-hidden flex flex-col">
     
     <!-- Top Header & Global Actions -->
@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <!-- Course Catalog Section -->
+    <!-- Course Catalog & Custom Entry Section -->
     <div class="p-3 sm:p-4 border-b border-slate-100 bg-white space-y-2">
       <div class="text-xs font-bold text-slate-600 flex items-center justify-between">
         <span class="flex items-center gap-1"><i class="fa-solid fa-building-columns text-teal-600"></i> 단과대별 개설 과목</span>
@@ -86,12 +86,68 @@
         <button onclick="filterFaculty('전체')" class="tab-btn active shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-teal-500 text-white transition cursor-pointer">전체</button>
         <button onclick="filterFaculty('음성합성엔진대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">음성합성엔진대학</button>
         <button onclick="filterFaculty('애니메이션대학')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer">애니메이션대학</button>
+        <button onclick="filterFaculty('기타')" class="tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-amber-100 text-amber-800 hover:bg-amber-200 transition cursor-pointer">✍️ 기타 (직접 입력)</button>
       </div>
 
       <!-- Course Cards Container -->
       <div id="course-list" class="space-y-2 max-h-52 overflow-y-auto pr-1">
         <!-- Dynamically rendered -->
       </div>
+
+      <!-- Custom Input Form (Hidden by default, shown on '기타' tab) -->
+      <div id="custom-course-form" class="hidden space-y-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
+        <div class="font-bold text-amber-900 flex items-center gap-1">
+          <span>✍️</span> 목록에 없는 커스텀 과목 추가
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="custom-name" placeholder="과목명 (예: 미연시학)" class="p-2 rounded-lg border border-slate-200 bg-white focus:outline-teal-500">
+          <input type="text" id="custom-prof" placeholder="교수명 (예: 라보멤)" class="p-2 rounded-lg border border-slate-200 bg-white focus:outline-teal-500">
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <select id="custom-day" class="p-2 rounded-lg border border-slate-200 bg-white">
+            <option value="월">월요일</option>
+            <option value="화">화요일</option>
+            <option value="수">수요일</option>
+            <option value="목">목요일</option>
+            <option value="금">금요일</option>
+          </select>
+          <select id="custom-start" class="p-2 rounded-lg border border-slate-200 bg-white">
+            <option value="9">09:00 시작</option>
+            <option value="10">10:00 시작</option>
+            <option value="11">11:00 시작</option>
+            <option value="12">12:00 시작</option>
+            <option value="13">13:00 시작</option>
+            <option value="14">14:00 시작</option>
+            <option value="15">15:00 시작</option>
+            <option value="16">16:00 시작</option>
+          </select>
+          <select id="custom-end" class="p-2 rounded-lg border border-slate-200 bg-white">
+            <option value="10">10:00 종료</option>
+            <option value="11">11:00 종료</option>
+            <option value="12">12:00 종료</option>
+            <option value="13">13:00 종료</option>
+            <option value="14">14:00 종료</option>
+            <option value="15" selected>15:00 종료</option>
+            <option value="16">16:00 종료</option>
+            <option value="17">17:00 종료</option>
+          </select>
+        </div>
+        <!-- Color Presets -->
+        <div class="flex items-center gap-2 pt-1">
+          <span class="text-[10px] text-slate-500 font-bold">색상:</span>
+          <div class="flex gap-1.5" id="color-picker">
+            <button type="button" onclick="selectColor('#d3f9d8', '#2b8a3e', this)" class="w-5 h-5 rounded-full bg-[#d3f9d8] border-2 border-teal-500 ring-2 ring-teal-300"></button>
+            <button type="button" onclick="selectColor('#e7f5ff', '#1971c2', this)" class="w-5 h-5 rounded-full bg-[#e7f5ff] border border-slate-300"></button>
+            <button type="button" onclick="selectColor('#fff3bf', '#f08c00', this)" class="w-5 h-5 rounded-full bg-[#fff3bf] border border-slate-300"></button>
+            <button type="button" onclick="selectColor('#ffe3e3', '#e03131', this)" class="w-5 h-5 rounded-full bg-[#ffe3e3] border border-slate-300"></button>
+            <button type="button" onclick="selectColor('#eebefa', '#9c36b5', this)" class="w-5 h-5 rounded-full bg-[#eebefa] border border-slate-300"></button>
+          </div>
+        </div>
+        <button onclick="addCustomCourse()" class="w-full py-2 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-lg shadow-xs transition active:scale-95 cursor-pointer mt-1">
+          + 시간표에 직접 추가하기
+        </button>
+      </div>
+
     </div>
 
     <!-- Enrolled Badges Bar -->
@@ -211,10 +267,12 @@
 
     const days = ['월', '화', '수', '목', '금'];
     const startHour = 9;
-    const endHour = 17; // Displays 09:00 - 17:00 grid
+    const endHour = 17;
 
     let enrolledCourses = [];
     let currentFaculty = '전체';
+    let selectedBgColor = '#d3f9d8';
+    let selectedTextColor = '#2b8a3e';
 
     window.onload = () => {
       renderCatalog();
@@ -224,14 +282,74 @@
     function filterFaculty(faculty) {
       currentFaculty = faculty;
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        if(btn.innerText === faculty) {
+        if(btn.innerText.includes(faculty)) {
           btn.className = 'tab-btn active shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-teal-500 text-white transition cursor-pointer';
         } else {
           btn.className = 'tab-btn shrink-0 px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition cursor-pointer';
         }
       });
       document.getElementById('course-count-badge').innerText = faculty;
-      renderCatalog();
+
+      const customForm = document.getElementById('custom-course-form');
+      const courseList = document.getElementById('course-list');
+
+      if (faculty === '기타') {
+        customForm.classList.remove('hidden');
+        courseList.classList.add('hidden');
+      } else {
+        customForm.classList.add('hidden');
+        courseList.classList.remove('hidden');
+        renderCatalog();
+      }
+    }
+
+    function selectColor(bg, text, el) {
+      selectedBgColor = bg;
+      selectedTextColor = text;
+      document.querySelectorAll('#color-picker button').forEach(btn => {
+        btn.className = 'w-5 h-5 rounded-full border border-slate-300';
+      });
+      el.className = 'w-5 h-5 rounded-full border-2 border-teal-500 ring-2 ring-teal-300';
+    }
+
+    function addCustomCourse() {
+      const name = document.getElementById('custom-name').value.trim();
+      const prof = document.getElementById('custom-prof').value.trim() || '자유교양';
+      const day = document.getElementById('custom-day').value;
+      const start = parseInt(document.getElementById('custom-start').value);
+      const end = parseInt(document.getElementById('custom-end').value);
+
+      if (!name) {
+        showToast('⚠️ 과목명을 입력해 주세요!');
+        return;
+      }
+      if (start >= end) {
+        showToast('⚠️ 종료 시간은 시작 시간보다 뒤여야 합니다!');
+        return;
+      }
+
+      const customCourse = {
+        id: 'custom_' + Date.now(),
+        faculty: '기타',
+        name: name,
+        professor: prof,
+        color: selectedBgColor,
+        textColor: selectedTextColor,
+        displayTime: `${day} ${start}:00~${end}:00`,
+        slots: [{ day: day, start: start, end: end }]
+      };
+
+      if (hasCollision(customCourse)) {
+        showToast('⚠️ 기존 시간표와 겹치는 시간이 있습니다!');
+        return;
+      }
+
+      enrolledCourses.push(customCourse);
+      document.getElementById('custom-name').value = '';
+      
+      renderTimetableGrid();
+      renderEnrolledBadges();
+      showToast(`✨ '${name}' 과목이 추가되었습니다!`);
     }
 
     function renderCatalog() {
@@ -267,7 +385,7 @@
     }
 
     function toggleEnroll(courseId) {
-      const course = officialCourses.find(c => c.id === courseId);
+      const course = officialCourses.find(c => c.id === courseId) || enrolledCourses.find(c => c.id === courseId);
       if (!course) return;
 
       const index = enrolledCourses.findIndex(e => e.id === courseId);
@@ -304,7 +422,6 @@
       return false;
     }
 
-    // Precise HTML table Rowspan rendering matrix algorithm
     function renderTimetableGrid() {
       const tbody = document.getElementById('timetable-body');
       tbody.innerHTML = '';
@@ -312,7 +429,6 @@
       const totalHours = endHour - startHour;
       const matrix = Array.from({ length: totalHours }, () => Array(5).fill(null));
 
-      // Map course slots onto matrix
       enrolledCourses.forEach(course => {
         course.slots.forEach(slot => {
           const dayIdx = days.indexOf(slot.day);
@@ -335,23 +451,20 @@
         });
       });
 
-      // Render table structure
       for (let h = 0; h < totalHours; h++) {
         const currentHour = startHour + h;
         const tr = document.createElement('tr');
 
-        // Time label column
         const timeTd = document.createElement('td');
         timeTd.className = 'time-col';
         timeTd.innerText = `${currentHour}:00`;
         tr.appendChild(timeTd);
 
-        // Day columns
         for (let d = 0; d < 5; d++) {
           const cellState = matrix[h][d];
 
           if (cellState && cellState.type === 'spanned') {
-            continue; // Skip rendering cell due to rowspan above
+            continue;
           }
 
           const td = document.createElement('td');
